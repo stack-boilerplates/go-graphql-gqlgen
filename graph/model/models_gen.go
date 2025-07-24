@@ -2,25 +2,31 @@
 
 package model
 
+type Category struct {
+	ID       string     `json:"id"`
+	Name     string     `json:"name"`
+	Products []*Product `json:"products"`
+}
+
+type CreateCategoryInput struct {
+	Name string `json:"name"`
+}
+
+type CreateProductInput struct {
+	Name        string  `json:"name"`
+	Description *string `json:"description,omitempty"`
+	CategoryID  string  `json:"categoryId"`
+}
+
 type Mutation struct {
 }
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+type Product struct {
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	Description *string   `json:"description,omitempty"`
+	Category    *Category `json:"category"`
 }
 
 type Query struct {
-}
-
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
-}
-
-type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
 }

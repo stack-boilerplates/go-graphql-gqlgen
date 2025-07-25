@@ -8,4 +8,5 @@ import "github.com/stack-boilerplate/go-graphql-gqlgen/database"
 
 type Resolver struct {
 	CategoryDB *database.Category
+	ProductDB  *database.Product
 }

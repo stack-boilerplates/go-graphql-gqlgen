@@ -11,6 +11,24 @@ import (
 	"github.com/stack-boilerplate/go-graphql-gqlgen/graph/model"
 )
 
+// Products is the resolver for the products field.
+func (r *categoryResolver) Products(ctx context.Context, obj *model.Category) ([]*model.Product, error) {
+	products, err := r.ProductDB.GetAllByCategoryID(obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get products for category %s: %w", obj.ID, err)
+	}
+
+	var result []*model.Product
+	for _, product := range products {
+		result = append(result, &model.Product{
+			ID:          product.ID,
+			Name:        product.Name,
+			Description: &product.Description,
+		})
+	}
+	return result, nil
+}
+
 // CreateCategory is the resolver for the createCategory field.
 func (r *mutationResolver) CreateCategory(ctx context.Context, input model.CreateCategoryInput) (*model.Category, error) {
 	category, err := r.CategoryDB.Create(input.Name)
@@ -25,7 +43,27 @@ func (r *mutationResolver) CreateCategory(ctx context.Context, input model.Creat
 
 // CreateProduct is the resolver for the createProduct field.
 func (r *mutationResolver) CreateProduct(ctx context.Context, input model.CreateProductInput) (*model.Product, error) {
-	panic(fmt.Errorf("not implemented: CreateProduct - createProduct"))
+	product, err := r.ProductDB.Create(input.Name, *input.Description, input.CategoryID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create product: %w", err)
+	}
+	return &model.Product{
+		ID:          product.ID,
+		Name:        product.Name,
+		Description: &product.Description,
+	}, nil
+}
+
+// Category is the resolver for the category field.
+func (r *productResolver) Category(ctx context.Context, obj *model.Product) (*model.Category, error) {
+	category, err := r.CategoryDB.GetByProductID(obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get category for product %s: %w", obj.ID, err)
+	}
+	return &model.Category{
+		ID:   category.ID,
+		Name: category.Name,
+	}, nil
 }
 
 // Categories is the resolver for the categories field.
@@ -47,14 +85,36 @@ func (r *queryResolver) Categories(ctx context.Context) ([]*model.Category, erro
 
 // Products is the resolver for the products field.
 func (r *queryResolver) Products(ctx context.Context) ([]*model.Product, error) {
-	panic(fmt.Errorf("not implemented: Products - products"))
+	products, err := r.ProductDB.GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get products: %w", err)
+	}
+
+	var result []*model.Product
+	for _, product := range products {
+		result = append(result, &model.Product{
+			ID:          product.ID,
+			Name:        product.Name,
+			Description: &product.Description,
+			//CategoryID:  &product.CategoryID,
+		})
+	}
+	return result, nil
 }
+
+// Category returns CategoryResolver implementation.
+func (r *Resolver) Category() CategoryResolver { return &categoryResolver{r} }
 
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
+// Product returns ProductResolver implementation.
+func (r *Resolver) Product() ProductResolver { return &productResolver{r} }
+
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+type categoryResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
+type productResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

@@ -28,12 +28,20 @@ Then execute sqlite prompt in db file
 ```shell
 sqlite3 data.db
 ```
+## Database structure
+
+In case of lost your data.db, re-create then with this structure:
+
+```sql
+create table categories (id string, name string);
+create table products (id string, name string, description string, category_id string);
+```
 
 ## Query samples for GraphQL playgroung
 
 Select categories
 
-```json
+```graphql
 query queryCategories {
   categories {
     id
@@ -41,12 +49,68 @@ query queryCategories {
   }
 }
 ```
+Select categories and products
+
+```graphql
+query queryCategoriesProducts {
+  categories {
+    id
+    name
+    products {
+      id
+      name
+    }
+  }
+}
+```
 
 Create new category
 
-```json
+```graphql
 mutation createCategory {
-  createCategory(input: {name: "Blue Cheese 250gr"}) {
+  createCategory(input: {name: "Blue Cheese"}) {
+    id
+  }
+}
+```
+
+Select products
+
+```graphql
+query queryProducts {
+  products {
+    id
+    name
+    description
+  }
+}
+```
+
+Select products with category
+
+```graphql
+query queryProductsCategory {
+  products {
+    id
+    name
+    description
+    category {
+      id
+      name
+    }
+  }
+}
+```
+
+Create new product
+
+```graphql
+mutation createProduct {
+  createProduct(input: {
+    name: "Vigor Gorgon Space",
+    description: "Vigor Gorgonzola 250gr in a tablet",
+    categoryId: "ce9b0a14-32f6-47fc-93da-245a6da05b6d"
+  }) {
     id
   }
 }

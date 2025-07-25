@@ -12,7 +12,7 @@ type Category struct {
 	Name string `json:"name"`
 }
 
-func NewCategory(db *sql.DB, id, name string) *Category {
+func NewCategory(db *sql.DB) *Category {
 	return &Category{db: db}
 }
 
@@ -45,4 +45,13 @@ func (c *Category) GetAll() ([]Category, error) {
 		return nil, err
 	}
 	return categories, nil
+}
+
+func (c *Category) GetByProductID(id string) (Category, error) {
+	var category Category
+	err := c.db.QueryRow("SELECT c.id, c.name FROM categories c JOIN products p ON c.id = p.category_id WHERE p.id = $1", id).Scan(&category.ID, &category.Name)
+	if err != nil {
+		return Category{}, err
+	}
+	return category, nil
 }

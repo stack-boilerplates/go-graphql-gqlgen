@@ -2,12 +2,6 @@
 
 package model
 
-type Category struct {
-	ID       string     `json:"id"`
-	Name     string     `json:"name"`
-	Products []*Product `json:"products"`
-}
-
 type CreateCategoryInput struct {
 	Name string `json:"name"`
 }
@@ -19,13 +13,6 @@ type CreateProductInput struct {
 }
 
 type Mutation struct {
-}
-
-type Product struct {
-	ID          string    `json:"id"`
-	Name        string    `json:"name"`
-	Description *string   `json:"description,omitempty"`
-	Category    *Category `json:"category"`
 }
 
 type Query struct {

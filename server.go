@@ -28,7 +28,8 @@ func main() {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 	defer db.Close()
-	categoryDB := database.NewCategory(db, "", "")
+	categoryDB := database.NewCategory(db)
+	productDB := database.NewProduct(db)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -37,6 +38,7 @@ func main() {
 
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
 		CategoryDB: categoryDB,
+		ProductDB:  productDB,
 	}}))
 
 	srv.AddTransport(transport.Options{})
